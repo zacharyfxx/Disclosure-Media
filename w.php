@@ -28,7 +28,7 @@ $pressure = $json->list[0]->main->pressure;
 //$temp_high_2
 //$temp_low_2
 
-echo("Current weather in Oroville: ".$weather." ".F($temp)." (".F($temp_low)."/".F($temp_high)."), \n".C($temp)." (".C($temp_low)."/".C($temp_high).") \nWind: ".$wind_dir."@".$wind_speed."mph \nRainfall(3h): ".$rainfall." \nHumidity: ".$humidity."% \nBarometer: ".$pressure." hpa");
+echo("Current weather in Oroville: ".$weather." ".F($temp)." (".F($temp_low)."/".F($temp_high)."), \n".C($temp)." (".C($temp_low)."/".C($temp_high).") \nWind: ".$wind_dir."@".$wind_speed."mph \nRainfall(3h): ".$rainfall."in. \nHumidity: ".$humidity."% \nBarometer: ".$pressure." hpa");
 
 
 
