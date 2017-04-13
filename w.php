@@ -21,17 +21,15 @@ $rainfall = round($json->list[0]->rain->{'3h'}, 2);
 $humidity = $json->list[0]->main->humidity;
 $pressure = $json->list[0]->main->pressure;
 
-$temp_high_1 = $json->list[1]->main->temp_min;
+//$temp_high_1 = $json->list[1]->main->temp_min;
+
 //$temp_low_1
 
 //$temp_high_2
 //$temp_low_2
-if(isset($_POST["f"]) {
-	echo $temp_high_1;
 
-} else {
 echo("Current weather in Oroville: ".$weather." ".F($temp)." (".F($temp_low)."/".F($temp_high)."), \n".C($temp)." (".C($temp_low)."/".C($temp_high).") \nWind: ".$wind_dir."@".$wind_speed."mph \nRainfall(3h): ".$rainfall." \nHumidity: ".$humidity."% \nBarometer: ".$pressure." hpa");
-}
+
 
 
 
