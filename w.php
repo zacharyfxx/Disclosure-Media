@@ -1,36 +1,102 @@
 <?php
 //weather data
 //7262050	Oroville East	39.511261	-121.475189	US
+if(isset($_GET['f'])) {
+  $dtype = "forecast/daily?";
+  $days = "&cnt=4";
+}else{
+  $dtype = "weather?";
+  $days = "";
 
-$link = "http://api.openweathermap.org/data/2.5/forecast?";
+}
+
+$link = "http://api.openweathermap.org/data/2.5/".$dtype;
 $coords = "lat=39.511261&lon=-121.475189";
+$id="&id=5379759";
+$zip = "&zip=95966,us";
 $OWM_api_key = "&APPID=631d58029795a1c4e9af8814c776ceb6";
 
-$page = file_get_contents($link.$coords.$OWM_api_key);
-$json = json_decode($page);
-//var_export($json);
-//pretty_var($json);
-
-$temp = $json->list[0]->main->temp;
-$temp_low = $json->list[0]->main->temp_min;
-$temp_high = $json->list[0]->main->temp_max;
-$weather = $json->list[0]->weather[0]->description;
-$wind_speed = $json->list[0]->wind->speed;
-$wind_dir = getDirection($json->list[0]->wind->deg);
-$rainfall = round($json->list[0]->rain->{'3h'}, 2);
-$humidity = $json->list[0]->main->humidity;
-$pressure = $json->list[0]->main->pressure;
-
-//$temp_high_1 = $json->list[1]->main->temp_min;
-
-//$temp_low_1
-
-//$temp_high_2
-//$temp_low_2
-
-echo("Current weather in Oroville: ".$weather." ".F($temp)." (".F($temp_low)."/".F($temp_high)."), \n".C($temp)." (".C($temp_low)."/".C($temp_high).") \nWind: ".$wind_dir."@".$wind_speed."mph \nRainfall(3h): ".$rainfall."in. \nHumidity: ".$humidity."% \nBarometer: ".$pressure." hpa");
+$url = $link.$zip.$days.$OWM_api_key;
+//print($url);
 
 
+if(isset($_GET['f'])) {
+
+  $page = file_get_contents($url."&mode=xml");
+  //$json = json_decode($page);
+  $xml = simplexml_load_string($page);
+  //var_export($json);
+  //pretty_var($xml);
+  $json = json_encode($xml);
+  $json = json_decode($json,true);
+  //print_r($json);
+
+
+  //print_r($json['forecast']['time'][0]['temperature']['@attributes']);
+  
+  $temp_high = array();
+  $temp_low = array();
+  $date = array();
+  for ($i = 1; $i <= 3; $i++) {
+    $att = $json['forecast']['time'][$i];
+    $temp_high[$i] = $att['temperature']['@attributes']['max'];
+    $temp_low[$i] = $att['temperature']['@attributes']['min'];
+    $date[$i] = $att['@attributes']['day'];
+  }
+  //print_r($temp_high);
+  //print_r($temp_low);
+  //print_r($date);
+
+
+  // $rainfall = round($json_rain->list[0]->forecast->{'3h'}, 2);
+
+  //$temp_high_1 = $json['forecast']['temperature']['min'];
+  // $temp_low_1 = $json->list[1]->temp->max;
+  // $dt1 = date('m/d', $json->list[1]->dt);
+
+  // $temp_high_2 = $json->list[2]->temp->min;
+  // $temp_low_2 = $json->list[2]->temp->max;
+  // $dt2 = date('m/d', $json->list[2]->dt);
+
+  // $temp_high_3 = $json->list[3]->temp->min;
+  // $temp_low_3 = $json->list[3]->temp->max;
+  // $dt3 = date('m/d', $json->list[3]->dt);
+
+  //$forecast = $temp_high_1;
+  $forecast = "Weather forecast for {$json['location']['name']}: ";
+  // [".$dt1."] (".F($temp_high[0])."/".F($temp_low[0])."),
+  foreach ($temp_high as $i=>$high) {
+    $date[$i] = str_replace("-","/",$date[$i]);
+    $forecast .= "[".substr($date[$i],5,5)."] <(".F($high)."/".F($temp_low[$i])."), (".C($high)."/".C($temp_low[$i]).")>".($i==count($temp_high) ? "" : ", ");
+  }
+} else {
+
+  $page = file_get_contents($url);
+  $json = json_decode($page);
+  //var_export($json);
+  pretty_var($json);
+
+  $temp = $json->main->temp;
+  $temp_low = $json->main->temp_min;
+  $temp_high = $json->main->temp_max;
+  $weather = $json->weather[0]->description;
+  $wind_speed = $json->wind->speed;
+  $wind_dir = getDirection($json->wind->deg);
+  $humidity = $json->main->humidity;
+  $pressure = $json->main->pressure;
+
+  //echo("Current weather in Oroville: ".$weather." ".F($temp)." (".F($temp_low)."/".F($temp_high)."), \n".C($temp)." (".C($temp_low)."/".C($temp_high).") \nWind: ".$wind_dir."@".$wind_speed."mph \nHumidity: ".$humidity."% \nBarometer: ".$pressure." hpa");
+
+  $current = ("Current weather in Oroville: ".$weather." ".F($temp)." (".F($temp_low)."/".F($temp_high)."), \n".C($temp)." (".C($temp_low)."/".C($temp_high).") \nWind: ".$wind_dir."@".$wind_speed."mph \nHumidity: ".$humidity."% \nBarometer: ".$pressure." hpa");
+
+}
+
+
+if(isset($_GET['f'])) {
+	echo $forecast;
+} else {
+	echo $current;
+}
 
 
 //Functions
